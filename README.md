@@ -1,2 +1,2 @@
 # omniquant
-Methods for versatile quantififications of LCMS data.
+Versatile quantification methods for LCMS data.
