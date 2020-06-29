@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+project_paths
+all.R
+analysis.R
+test.R
