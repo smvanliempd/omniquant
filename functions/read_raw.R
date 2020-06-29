@@ -7,7 +7,7 @@ read.raw <- function(data.path, raw.files, sample.data) {
   # check if sample meta data is available
   no.meta <- missing(sample.data)
   
-  # Cycle to raw files
+  # Cycle trough raw files
   dat <- sapply( raw.files , function(f) { 
     
     # Get raw text file
