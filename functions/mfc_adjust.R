@@ -101,8 +101,8 @@ mfc.adjust   <- function( dat ) {
          height= 5, width = 0.05*n_samples + 1)
   
   # out
-  dat$data <-  full.data
-  dat$mfc  <-  list(data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
+  dat$data <- full.data
+  dat$mfc  <- list(data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
   
   return(dat)
   

@@ -4,6 +4,7 @@
 curve.checks <- function( dat ) {
   
   # Get data
+  # dat <- readRDS("d5.rds")
   project.path <- dat$project_path
   full.data    <- dat$data
   calibrants   <- dat$calibrants
@@ -12,7 +13,7 @@ curve.checks <- function( dat ) {
   # Note that it does NOT use QC adjusted values for the curve. 
   #  This is OK because extrapolation from a polynomial of order 2 or higher 
   #  can go terribly wrong.
-  logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > 0.1)
+  logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" )
   full.data[ eval(logical.test) , Signal_adj_cal := Signal_MFC]
   
   # Calculate signed relative standard deviation (snRSD) between first and second curves
@@ -24,6 +25,7 @@ curve.checks <- function( dat ) {
   #  below (curve 1  < curve 2) or above (curve 1 > curve 2) zero (arbitrary)
   #  in order to not assign bias.
   pcurve.tol <- 0.35
+  logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > 0.1)
   cb.data <- full.data[ eval(logical.test) ,{
     cbm <- mean(snRSD, na.rm = T)
     cbs <- sd(snRSD, na.rm = T)
@@ -35,7 +37,7 @@ curve.checks <- function( dat ) {
   ,  by = Analytes ]
   
   # Select calibrants of which the first curve is biased compared to second curve
-  cb.analytes <- cb.data[cbf == "Curves are biased", Analytes]
+  cb.analytes <- cb.data[cbf == "Biased", Analytes]
   
   # Delete 2nd curve when curves are biased after MFC adjustment
   full.data[ Analytes %in% cb.analytes & Injection.Replicate == 2, Signal_adj_cal := NA  ]
@@ -62,6 +64,10 @@ curve.checks <- function( dat ) {
   
   # Data output
   dat$data <- full.data
+  dat$curves <- list(biased_calibrants = cb.analytes,
+                     data_curve_bias   = cb.data,
+                     plot_curve_bias  = p1)
+  
   
   return(dat)
   
