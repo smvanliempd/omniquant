@@ -1,5 +1,4 @@
 # QC corrections of MFC adjusted data 
-
 qc.adjust    <- function( dat, ord = 3 ) {
   
   # get data
@@ -8,8 +7,7 @@ qc.adjust    <- function( dat, ord = 3 ) {
   project.path <- dat$project_path
   n.analytes   <- sum(nrow(dat$analytes))
   
-  # Scale QC data on maximum values per QC group
-  
+  # Scale MFC corrected QC values on maximum values per Analyte
   full.data[Sample.Class == "QC"  , QC_signal_s := {
     max_s <- max(Signal_MFC)
     if(max_s > 0 ) {
@@ -62,7 +60,7 @@ qc.adjust    <- function( dat, ord = 3 ) {
                            ifelse(ord == 1, "st",
                                   ifelse(ord == 2, "nd", "rd") ),"-order polynomal."),
          x = "Injection Number",
-         y = "Scaled QC-signals\n(max = 1)") +
+         y = "QC-signals\n(scaled, max = 1; MFC adj)") +
     ylim(0,NA) +
     facet_wrap( ~ Analytes, ncol = 6) +
     theme_bw()

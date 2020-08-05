@@ -17,7 +17,7 @@ quant.analysis <- function(project.dirs) {
     d4 <- mfc.adjust.curve(d3)
     cat("...done!")
     cat(paste0("\n QC adjustments"))
-    d5 <- qc.adjust(d4,  ord = 2)
+    d5 <- qc.adjust(d4) #change polynomial order with ord = x
     cat("...done!")
     cat(paste0("\n Check calibration curves"))
     d6 <- curve.checks(d5)
