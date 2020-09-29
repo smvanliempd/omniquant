@@ -25,7 +25,7 @@ quantify     <- function( dat ) {
   full.data[ , c("Curve_adj" , "Curve_min_adj") := {
     ai   <- Signal_adj_cal - Baseline
     mini <- 3 * Baseline
-    ai   <- ifelse(ai < mini, NA, ai)
+    ai   <- ifelse(ai <= mini, NA, ai)
     list(ai, mini )
   }   ]
   
