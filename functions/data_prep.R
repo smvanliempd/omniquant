@@ -35,8 +35,8 @@ data.prep    <- function( project.path ) {
   analytes    <- unique(dat$Analyte)
   if( !setequal(analytes,analytes.md ) ) {
     stop(
-      paste0("\nThese analytes are not in the meta data:\n", paste(analytes.md[!(analytes.md %in% analytes)],collapse = "\n"),
-             "\n\nThese analytes are not in the QuanLynx data:\n",paste(analytes[!(analytes %in% analytes.md)],collapse = "\n")
+      paste0("\nThese analytes are not in the MASS SPEC data:\n", paste(analytes.md[!(analytes.md %in% analytes)],collapse = "\n"),
+             "\n\nThese analytes are not in the META DATA data:\n",paste(analytes[!(analytes %in% analytes.md)],collapse = "\n")
       ) 
     )
   }
