@@ -48,7 +48,7 @@ qc.adjust    <- function( dat, ord = 3 ) {
   full.data[ Sample.Class %in% c("QC","Sample"), Signal_MFC_QC := Signal_MFC/QC_model] #
   
   # plot QC- drift models 
-  qc.plots <- ggplot(full.data ) +
+  qc.plots <- ggplot(full.data[Sample.Class %in% c("QC","Sample")] ) +
     geom_point(aes(x   = Injection.Number,
                    y   = QC_signal_s), na.rm = T) +
     geom_line(aes(x = Injection.Number,
