@@ -18,6 +18,12 @@ data.prep    <- function( project.path ) {
   colnames(sample.data) <- c.names
   sample.data <- data.table(sample.data)
   
+  #Delete superfluous columns in sample data
+  supcols <- c("Inlet.File","MS.File")
+  if (all(supcols %in% colnames(sample.data))) {
+    sample.data[,get("supcols") := NULL]
+  }
+  
   # Analyte data
   analyte.data <- data.table(read_excel(paste0(data.path,meta.file) , sheet = "Compounds" ))
   

@@ -26,15 +26,14 @@ read.raw <- function(data.path, raw.files, sample.data) {
     
     # Select rows
     row.select <- !is.na(row.select)
-    ql.data <- ql.data.raw[row.select,-1]
+    ql.data <- ql.data.raw[row.select,-(1:2)]
     
-    # Set proper column names
-    col.names <- c(ql.data.raw[grep("Name",ql.data.raw$V3)[1],-1])
+    # Set proper column names and delete superfluous columns
+    col.names <- c(ql.data.raw[grep("Name",ql.data.raw$V3)[1],-(1:2)])
     colnames(ql.data)      <- make.names(col.names)
-    colnames(ql.data)[1:2] <- c("Order","File.Name")
+    colnames(ql.data)[1] <- c("File.Name")
     
     # Set data types
-    ql.data$Order              <- as.integer(ql.data$Order)
     ql.data$RT                 <- as.numeric(ql.data$RT)
     ql.data$Area               <- as.numeric(ql.data$Area)
     ql.data$Peak.Start.Height  <- as.numeric(ql.data$Peak.Start.Height)
