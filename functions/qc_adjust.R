@@ -1,5 +1,5 @@
 # QC corrections of MFC adjusted data 
-qc.adjust    <- function( dat, ord = 3 ) {
+qc.adjust <- function( dat, ord = 3 ) {
   
   # get data
   full.data    <- dat$data
@@ -19,29 +19,39 @@ qc.adjust    <- function( dat, ord = 3 ) {
   } , by = Analytes]
   
   # Make QC models based on the non-labeled analyte
-  full.data[Analytes %in% qc.include & Analytes == Metabolite, QC_model := { 
+  if (length(qc.include) > 0 ) { #check if there are any analytes that need QC correction
+    full.data[Analytes %in% qc.include & Analytes == Metabolite, QC_model := { 
+      
+      # define qc data
+      d   <- data.frame(signal = QC_signal_s, Inj = Injection.Number)
+      
+      # linear model with order depending on the number of QCs available
+      o <- 1:ord
+      f <- formula(paste0("signal ~ ",paste( paste0("I(Inj^", o, ")"), collapse  = "+") ) )
+      m.lin  <- lm(f, data = d)
+      c.lin  <- coef(m.lin)
+      
+      # calculate correction factor
+      S.mod <- sapply( c(o, ord + 1)  , function(i) c.lin[i] * Injection.Number^(i - 1), simplify = T  )
+      S.mod <- rowSums(S.mod)
+      
+      list(S.mod)
+      
+    }, by = Analytes ]
     
-    # define qc data
-    d   <- data.frame(signal = QC_signal_s, Inj = Injection.Number)
+    # Bind QC-model of unlabeled metabolite with corresponding labeled one
+    qc.mods <- full.data[Analytes %in% qc.include & Analytes == Metabolite,.(File.Name, Metabolite, QC_model)]
+    full.data[ ,QC_model := NULL]
+    full.data <- merge(full.data, qc.mods, by = c("File.Name", "Metabolite"), all.x = T)
     
-    # linear model with order depending on the number of QCs available
-    o <- 1:ord
-    f <- formula(paste0("signal ~ ",paste( paste0("I(Inj^", o, ")"), collapse  = "+") ) )
-    m.lin  <- lm(f, data = d)
-    c.lin  <- coef(m.lin)
+  } else {
     
-    # calculate correction factor
-    S.mod <- sapply( c(o, ord + 1)  , function(i) c.lin[i] * Injection.Number^(i - 1), simplify = T  )
-    S.mod <- rowSums(S.mod)
+    full.data[Sample.Class == "QC"  , QC_model := as.double(NA)]
     
-    list(S.mod)
-    
-  }, by = Analytes ]
+  }
   
-  # Bind QC-model of unlabeled metabolite with corresponding labeled one
-  qc.mods <- full.data[Analytes %in% qc.include & Analytes == Metabolite,.(File.Name, Metabolite, QC_model)]
-  full.data[ ,QC_model := NULL]
-  full.data <- merge(full.data, qc.mods, by = c("File.Name", "Metabolite"), all.x = T)
+  
+  
   full.data[is.na(QC_model), QC_model := 1]
   
   # Adjust for QC drift (QC and Samples only)

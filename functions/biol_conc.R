@@ -21,7 +21,7 @@ biol.conc    <- function( dat ) {
   full.dat[ Sample.Class == "Sample" , Signal_assay_norm := (loss_fact  * vol_res * Signal_MFC_QC)/100 ]
   
   # scale signals on median of unlabeled metabolite per metabolite
-  full.dat[ Sample.Class == "Sample" , Signal_median_norm := Signal_assay_norm/.SD[ Analytes == Metabolite , median(Signal_assay_norm)  ] , by = Metabolite]
+  full.dat[ Sample.Class == "Sample" , Signal_median_norm := Signal_assay_norm/.SD[ Analytes == Metabolite , median(Signal_assay_norm, na.rm = T)  ] , by = Metabolite]
   
   # sort
   setkeyv(x = full.dat, cols= c("Metabolite", "Analytes"))
