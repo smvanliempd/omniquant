@@ -12,8 +12,8 @@ deisotope    <- function( dat ){
   # merge null data with full data
   full.dat <- merge(full.dat , dat.null, by = c("File.Name","Metabolite") , all.y = T)
   
-  # subtract natural 13Cn (n>0) from labeled
-  full.dat[Analytes != Metabolite ,Area_deiso := Area - Isotope_Corr * Area_sub ]
+  # subtract natural 13Cn (n>0) from labeled if not NA, otherwise take original area
+  full.dat[Analytes != Metabolite , Area_deiso := ifelse(is.na(Area_sub), Area, Area - Isotope_Corr * Area_sub )]
   
   # if subtractions lead to negative numbers set area to 0
   full.dat[Area_deiso < 0, Area_deiso:= 0]
