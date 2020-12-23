@@ -18,7 +18,7 @@ quantify     <- function( dat ) {
   
   # Define curve baseline
   full.data[Sample.Class == "Curve" & Analytes %in% quant.targets ,
-            Baseline := .SD[ Curve.Concentrations == 0, Signal_adj_cal  ] , 
+            Baseline := .SD[ Curve.Concentrations == 0, mean(Signal_adj_cal,na.rm = T)  ] , 
             by = c("Analytes", "Injection.Replicate")  ]
   
   # Subtract baseline from curves and delete signals below 3 sd's from the baseline
