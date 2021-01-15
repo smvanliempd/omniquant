@@ -21,10 +21,10 @@ curve.checks <- function( dat ) {
              snRSD := sign(Signal_adj_cal[Injection.Replicate == 1] - Signal_adj_cal[Injection.Replicate == 2]) * sd(Signal_adj_cal)/mean(Signal_adj_cal)
              ,  by = c("Analytes", "Sample.ID") ]
   
-  # less than 35% of the density of the snRSD distribution should be
+  # less than 10% of the density of the snRSD distribution should be
   #  below (curve 1  < curve 2) or above (curve 1 > curve 2) zero (arbitrary)
   #  in order to not assign bias.
-  pcurve.tol <- 0.35
+  pcurve.tol <- 0.1 #0.35
   logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > 0.1)
   cb.data <- full.data[ eval(logical.test) ,{
     cbm <- mean(snRSD, na.rm = T)
