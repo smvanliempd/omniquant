@@ -69,7 +69,7 @@ data.prep    <- function( project.path ) {
   dat <- dat[Delete != "ALL" | is.na(Delete)]
   
   # Delete samples for specifically defined Analytes
-  dat[!is.na(Delete)  , Delete := ifelse(Analytes %in% c(str_extract_all(Delete, "[A-Za-z0-9\\-\\_\\s]{1,}",simplify = T) ), "x", NA ) , by = c("File.Name") ]
+  dat[!is.na(Delete)  , Delete := ifelse(Analytes %in% c(str_extract_all(Delete, "[A-Za-z0-9\\-\\_\\s\\(\\)\\:]{1,}",simplify = T) ), "x", NA ) , by = c("File.Name") ]
   dat <- dat[Delete != "x" | is.na(Delete)]
   
   # get polarity and assay from file location
