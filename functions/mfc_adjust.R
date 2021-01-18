@@ -25,7 +25,7 @@ mfc.adjust   <- function( dat ) {
                                                                                  Injection.Number,
                                                                                  Injection.Replicate)], 
                    y = ml.data.raw, by = "File.Name", 
-                   all.x = T )
+                   all.y = T )
   # ml.data[ml.data == 0] <- NA
   ml.features   <- na.exclude(str_extract(colnames(ml.data),"[NXP]{1}[0-9]{1,}.[0-9]{2}_[0-9]{1,}.[0-9]{1,}"))
   
