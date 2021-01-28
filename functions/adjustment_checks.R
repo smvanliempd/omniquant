@@ -38,7 +38,10 @@ adjustment.checks <- function(dat){
     theme(axis.text.x = element_text(angle = 90,vjust = 0.5, hjust = 1))
   ggsave(paste0(project.path,"/graphs/adjust_checks.png"),pa,device = "png",dpi = 300, units = "in",
   height= 4, width = 1*n.analytes + 1)
+  
+  # return
   dat$adjustements <- pa
+  return(dat)
 
   
   }
