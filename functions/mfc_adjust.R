@@ -68,7 +68,7 @@ mfc.adjust   <- function( dat ) {
   n_samples <- nrow(sample.data)
   p1 <- ggplot() +
     geom_hline(yintercept = 1, col = "red")+
-    geom_boxplot(data = ml.mfc, aes(x = Injection.ID, y = FC/median(ml.mfc.red$MFC)), alpha = 0.9)+
+    geom_boxplot(data = ml.mfc[!is.na(FC)], aes(x = Injection.ID, y = FC/median(ml.mfc.red$MFC)), alpha = 0.9)+
     geom_text(data = ml.mfc.red, aes(x = Injection.ID, y = y_max, label =N),angle = 90,hjust = 0,vjust = 0.5,size =3,nudge_y = 0.1)+
     scale_y_log10()+
     labs(y = "FC (scaled on median of MFC)")+
