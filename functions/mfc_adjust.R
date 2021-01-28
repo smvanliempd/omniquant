@@ -61,7 +61,14 @@ mfc.adjust   <- function( dat ) {
   # merge data with mfc values and apply correction
   full.data   <- merge(full.data, ml.mfc.red[,.(File.Name,MFC_c)], by = "File.Name", all.x = T)
   full.data[ , Signal_MFC := ifelse(Analytes %in% analytes.include, Area_deiso/MFC_c, Area_deiso)]
-  mfc.data <- data.table(merge(sample.data[ , .(File.Name,File.Text,Sample.Class,Sample.ID,Experiment,Injection.Number,Incubation.Time) ],
+  mfc.data <- data.table(merge(sample.data[ , .(File.Name,
+                                                File.Text,
+                                                Sample.Class,
+                                                Sample.ID,
+                                                Experiment,
+                                                Injection.Number,
+                                                Weight,
+                                                Protein.Content) ],
                                ml.mfc.red[,.(File.Name,MFC,MFC_c)], by = "File.Name"))
   
   # plot FC values per sample/injection number
