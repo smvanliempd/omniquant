@@ -4,7 +4,6 @@
 curve.checks <- function( dat ) {
   
   # Get data
-  # dat <- readRDS("d5.rds")
   project.path <- dat$project_path
   full.data    <- dat$data
   calibrants   <- dat$calibrants
