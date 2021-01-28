@@ -47,12 +47,12 @@ mfc.adjust   <- function( dat ) {
   
   # Calculate fold-change values
   ml.mfc[ , FC := value/value[File.Name == ml.ref$File.Name], by = Feature]
-  ml.mfc <- ml.mfc[!is.na(FC)]
+  # ml.mfc <- ml.mfc[!is.na(FC)]
   
-  # ml.mfc <- merge(sample.data, ml.mfc, by = "File.Name")
+  # reduce mfc data
   ml.mfc.red <- ml.mfc[,  .(N = .N, 
-                            MFC = median(FC),
-                            y_max =  max(ml.mfc$FC),
+                            MFC = median(FC, na.rm = T),
+                            y_max =  max(ml.mfc$FC, na.rm = T),
                             Inj_nr = unique(as.integer(Injection.Number)),
                             Inj_rep = unique(as.integer(Injection.Replicate))), 
                        by = c("File.Name","Sample.Class","Sample.Group","Sample.ID","Injection.ID")]
@@ -102,7 +102,7 @@ mfc.adjust   <- function( dat ) {
   
   # out
   dat$data <- full.data
-  dat$mfc  <- list(data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
+  dat$mfc  <- list(raw = ml.mfc ,data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
   
   return(dat)
   
