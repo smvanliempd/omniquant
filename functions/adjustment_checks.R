@@ -25,7 +25,7 @@ adjustment.checks <- function(dat){
       m <- mean(RSD_sample, na.rm = T)
       s <- sd(RSD_sample, na.rm = T)
       mn <- m - s
-      if(mn < 0) mn <- 0
+      if(mn < 0 | is.na(mn)) mn <- 0
       mx <- m + s
       list(m,s,mn,mx)
     }, by = c("Analytes", "Data_type") ]
