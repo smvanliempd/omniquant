@@ -50,13 +50,16 @@ mfc.adjust   <- function( dat ) {
   # ml.mfc <- ml.mfc[!is.na(FC)]
   
   # reduce mfc data
-  ml.mfc.red <- ml.mfc[,  .(N = .N, 
-                            MFC = median(FC, na.rm = T),
-                            y_max =  max(ml.mfc$FC, na.rm = T),
-                            Inj_nr = unique(as.integer(Injection.Number)),
-                            Inj_rep = unique(as.integer(Injection.Replicate))), 
+  ml.mfc.red <- ml.mfc[!is.na(FC),  .(N = .N, 
+                                      MFC = median(FC, na.rm = T),
+                                      y_max =  max(ml.mfc$FC, na.rm = T),
+                                      Inj_nr = unique(as.integer(Injection.Number)),
+                                      Inj_rep = unique(as.integer(Injection.Replicate))), 
                        by = c("File.Name","Sample.Class","Sample.Group","Sample.ID","Injection.ID")]
   ml.mfc.red[ , MFC_c := MFC/median(MFC)]
+  
+  # merge raw data with MFC values
+  ml.mfc <- merge(ml.mfc, ml.mfc.red[,.(File.Name,MFC_c)], by = "File.Name")
   
   # merge data with mfc values and apply correction
   full.data   <- merge(full.data, ml.mfc.red[,.(File.Name,MFC_c)], by = "File.Name", all.x = T)
