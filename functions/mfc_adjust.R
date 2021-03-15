@@ -18,7 +18,7 @@ mfc.adjust   <- function( dat ) {
                                      stringsAsFactors = F))
   colnames(ml.data.raw)[1] <- "File.Name"
   ml.data <- merge(x = sample.data[Sample.Class %in% c("QC","Sample","Blank"), .(File.Name,
-                                                                                 File.Text,
+                                                                                 # File.Text,
                                                                                  Sample.Class,
                                                                                  Sample.Group,
                                                                                  Sample.ID,
