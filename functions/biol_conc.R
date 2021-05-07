@@ -9,10 +9,13 @@ biol.conc    <- function( dat ) {
   vol_hom <- assay.data[Metric == "Homogenization_volume", Value] # µL
   vol_sv  <- assay.data[Metric == "Speedvac_volume", Value]       # µL
   vol_res <- assay.data[Metric == "Resuspention_volume", Value]   # µL
-  cell_nr <- assay.data[Metric == "Cell_count_per_well", Value]   # million
+  cell_nr <- assay.data[Metric == "Cell_count_per_well", Value]
   
   #  calculate loss due to sample preparation
   loss_fact <- vol_hom/vol_sv
+  
+  # calculate amount from original sample
+  full.dat[ Sample.Class == "Sample" , Sample_amount := (loss_fact  * vol_res * Conc_raw_adj)] # pmol
   
   # calculate concentrations per amount of cells
   full.dat[ Sample.Class == "Sample" , Conc_biol := (loss_fact  * vol_res * Conc_raw_adj)/cell_nr] #nmol/million cells
