@@ -44,7 +44,7 @@ mfc.adjust   <- function( dat ) {
     ml.mfc <- ml.mfc[Sample.Class != "Blank" & !(Feature %in% ml.features.delete)]
     
     # Get reference sample. Selection is based on highest number of features 
-    ml.ref <- ml.mfc[is.na(value) , .N, by = c("File.Name") ]
+    ml.ref <- ml.mfc[!is.na(value) , .N, by = c("File.Name") ]
     ml.ref <- ml.ref[which.max(N)]
     
     # Calculate fold-change values
