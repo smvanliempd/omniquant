@@ -7,9 +7,9 @@ qc.adjust <- function( dat, ord = 3 ) {
   project.path <- dat$project_path
   n.analytes   <- sum(nrow(dat$analytes))
   
-  # Scale MFC corrected QC values on maximum values per Analyte
+  # Scale MFC corrected QC values on first QC value
   full.data[Sample.Class == "QC"  , QC_signal_s := {
-    max_s <- max(Signal_MFC)
+    max_s <- Signal_MFC[Injection.Replicate == 1]
     if(max_s > 0 ) {
       ss <- Signal_MFC/max_s
     } else {
