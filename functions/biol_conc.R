@@ -15,7 +15,13 @@ biol.conc    <- function( dat ) {
   loss_fact <- vol_hom/vol_sv
   
   # calculate amount from original sample
-  full.dat[ Sample.Class == "Sample" , Sample_amount := (loss_fact  * vol_res * Conc_raw_adj)] # pmol
+  full.dat[ Sample.Class == "Sample", Sample_amount := (loss_fact  * vol_res * Conc_raw_adj)] # pmol
+  
+  # calculate amount per tissue weight depending on whether values are MFC adjusted or not.
+  mets.mfc <- dat$mfc$included
+  full.dat[ Sample.Class == "Sample", Amount_mg_tissue := ifelse(Analytes %in% mets.mfc, 
+                                                                  Sample_amount/median(Weight),
+                                                                  Sample_amount/Weight)]
   
   # calculate concentrations per amount of cells
   full.dat[ Sample.Class == "Sample" , Conc_biol := (loss_fact  * vol_res * Conc_raw_adj)/cell_nr] #nmol/million cells
