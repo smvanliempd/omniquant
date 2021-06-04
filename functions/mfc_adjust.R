@@ -72,6 +72,7 @@ mfc.adjust   <- function( dat ) {
                                                   Sample.ID,
                                                   Experiment,
                                                   Injection.Number,
+                                                  Cell.Count,
                                                   Weight,
                                                   Protein.Content) ],
                                  ml.mfc.red[,.(File.Name,MFC,MFC_c)], by = "File.Name"))
@@ -115,10 +116,13 @@ mfc.adjust   <- function( dat ) {
     # out
     dat$data <- full.data
     dat$mfc  <- list(done = T,raw = ml.mfc ,data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
+    
   } else {
+    
     dat$data[ , MFC_c := 1]
     dat$data[ , Signal_MFC := dat$data$Area_deiso]
     dat$mfc$done <- FALSE
+    
   }
   
   return(dat)
