@@ -71,7 +71,7 @@ qc.adjust <- function( dat, ord = 3 ) {
                                   ifelse(ord == 2, "nd", "rd") ),"-order polynomal."),
          x = "Injection Number",
          y = "QC-signals\n(scaled, max = 1; MFC adj)") +
-    ylim(0,NA) +
+    ylim(0,2) +
     facet_wrap( ~ Analytes, ncol = 6) +
     theme_bw()
   ggsave(paste0(project.path, "/graphs/qc_plots.png"),
