@@ -57,7 +57,11 @@ mfc.adjust   <- function( dat ) {
                                         y_max =  max(ml.mfc$FC, na.rm = T),
                                         Inj_nr = unique(as.integer(Injection.Number)),
                                         Inj_rep = unique(as.integer(Injection.Replicate))), 
-                         by = c("File.Name","Sample.Class","Sample.Group","Sample.ID","Injection.ID")]
+                         by = c("File.Name",
+                                "Sample.Class",
+                                "Sample.Group",
+                                "Sample.ID",
+                                "Injection.ID")]
     ml.mfc.red[ , MFC_c := MFC/median(MFC)]
     
     # merge raw data with MFC values
@@ -70,29 +74,56 @@ mfc.adjust   <- function( dat ) {
                                                   File.Text,
                                                   Sample.Class,
                                                   Sample.ID,
-                                                  Experiment,
+                                                  # Experiment,
                                                   Injection.Number,
                                                   Cell.Count,
                                                   Weight,
                                                   Protein.Content) ],
                                  ml.mfc.red[,.(File.Name,MFC,MFC_c)], by = "File.Name"))
     
-    # plot FC values per sample/injection number
+    # get number of samples to adjust graph widths accordingly
     n_samples <- nrow(sample.data)
+    
+    # plot FC values per sample/injection number
     p1 <- ggplot() +
       geom_hline(yintercept = 1, col = "red")+
-      geom_boxplot(data = ml.mfc[!is.na(FC)], aes(x = Injection.ID, y = FC/median(ml.mfc.red$MFC)), alpha = 0.9)+
-      geom_text(data = ml.mfc.red, aes(x = Injection.ID, y = y_max, label =N),angle = 90,hjust = 0,vjust = 0.5,size =3,nudge_y = 0.1)+
+      geom_boxplot(data = ml.mfc[!is.na(FC)],
+                   aes(x = Injection.ID,
+                       y = FC/median(ml.mfc.red$MFC)), 
+                   alpha = 0.9)+
+      geom_text(data = ml.mfc.red, 
+                aes(x = Injection.ID, 
+                    y = y_max, 
+                    label = N),
+                angle = 90,
+                hjust = 0,
+                vjust = 0.5,
+                size = 3,
+                nudge_y = 0.1)+
       scale_y_log10()+
       labs(y = "FC (scaled on median of MFC)")+
       theme_bw() +
-      theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
+      theme(axis.text.x = element_text(angle = 90,
+                                       hjust = 1,
+                                       vjust = 0.5),
             axis.title.x = element_blank())
-    ggsave(paste0(project.path,"/graphs/fc_plots.png"),p1,device = "png",dpi = 300, units = "in",
-           height= 8, width = 0.18*n_samples + 1)
+    ggsave(paste0(project.path,"/graphs/fc_plots.png"),
+           p1,
+           device = "png",
+           dpi = 300, 
+           units = "in",
+           height= 8, 
+           width = 0.18*n_samples + 1)
     
-    p2 <- ggplot(ml.mfc.red, aes(x = Inj_nr, y = MFC_c, col = Sample.Class )) +
-      geom_smooth(method = "lm", formula = 'y ~ x',col = "black", lty = 2, size = .5)+
+    p2 <- ggplot(ml.mfc.red, 
+                 aes(x = Inj_nr,
+                     y = MFC_c,
+                     col = Sample.Class )) +
+      geom_smooth(method = "lm", 
+                  formula = 'y ~ x',
+                  col = "black", 
+                  lty = 2, 
+                  size = .5)+
       geom_point() +
       scale_color_manual(values = c("red","black"))+
       scale_x_continuous(breaks = seq(0,max(ml.mfc.red$Inj_nr), by = 10)) +
@@ -102,20 +133,31 @@ mfc.adjust   <- function( dat ) {
            height= 5, width = 0.05*n_samples + 1)
     
     
-    p3 <- ggplot(ml.mfc.red[Sample.Class == "Sample"], aes(x = Sample.ID, y = MFC_c, col = factor(Inj_rep))) +
+    p3 <- ggplot(ml.mfc.red[Sample.Class == "Sample"], 
+                 aes(x = Sample.ID, 
+                     y = MFC_c,
+                     col = factor(Inj_rep))) +
       geom_hline(yintercept = 1, lty = 2)+
       geom_hline(yintercept = 0)+
       geom_point() +
-      scale_color_manual(name = "Injection\nnumber",values = c("blue","orangered","darkgreen"))+
+      scale_color_manual(name = "Injection\nnumber",
+                         values = c("blue","orangered","darkgreen"))+
       ylim(0,NA)+
       theme_bw()+
-      theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),axis.title.x = element_blank())
+      theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
+            axis.title.x = element_blank())
     ggsave(paste0(project.path,"/graphs/mfc_vs_sample-id.png"),p3,device = "png",dpi = 300, units = "in",
            height= 5, width = 0.05*n_samples + 1)
     
     # out
     dat$data <- full.data
-    dat$mfc  <- list(done = T,raw = ml.mfc ,data = mfc.data, plot_fc = p1 ,plot_injnr = p2, plot_id = p3,included = analytes.include )
+    dat$mfc  <- list(done = T,
+                     raw = ml.mfc,
+                     data = mfc.data,
+                     plot_fc = p1,
+                     plot_injnr = p2, 
+                     plot_id = p3,
+                     included = analytes.include )
     
   } else {
     
