@@ -16,7 +16,8 @@ deisotope    <- function( dat ){
   full.dat[Analytes != Metabolite , Area_deiso := as.double(ifelse(is.na(Area_sub), Area, Area - Isotope_Corr * Area_sub ))]
   
   # if subtractions lead to negative numbers set area to 0
-  full.dat[Area_deiso < 0, Area_deiso:= 0]
+  # full.dat[Area_deiso < 0, Area_deiso:= 0]
+  full.dat[Area_deiso < 0, Area_deiso:= ifelse(Sample.Class == "Sample", NA, 0) ]
   
   # for 13C0 set Area_deiso to the original area
   full.dat[Analytes == Metabolite ,Area_deiso := Area  ]
