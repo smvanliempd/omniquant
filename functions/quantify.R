@@ -158,6 +158,7 @@ quantify     <- function( dat ) {
     # Make curve plots for ALL INITIAL calibrants (also if curve is not possible)
     conc <- unique(full.data[Sample.Class == "Curve" & Curve.Concentrations != 0, Curve.Concentrations])
     max.conc <-full.data[,max(Curve.Concentrations, na.rm = T)]
+    min.conc <-full.data[Curve.Concentrations > 0,min(Curve.Concentrations, na.rm = T)]
     p1 <- ggplot(full.data[Sample.Class == "Curve" & Analytes %in% calibrants & Curve.Concentrations != 0, ], 
                  aes(x = Curve.Concentrations )) +
       geom_point(aes(y = Curve_adj, col = factor(Injection.Replicate) , alpha = included), na.rm = T) +
@@ -167,7 +168,7 @@ quantify     <- function( dat ) {
       scale_fill_manual(name = NULL, values = "#0029ff") +
       scale_color_manual(name = NULL, values = c("#0029ff", "#ff5700"), labels = c("curve 1", "curve 2") ) +
       scale_alpha_manual(name = "Included", values = c(no = 0.2, yes = 0.8), labels = c("no", "yes"), na.translate = F  ) +
-      scale_x_log10(breaks = conc, limits = c(0.01,max(max.conc)),
+      scale_x_log10(breaks = conc, limits = c(min.conc,max.conc),
                     labels =format(conc, drop0trailing = T ) ) +
       scale_y_log10() +
       labs(title = "Calibration curves",

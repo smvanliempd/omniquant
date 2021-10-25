@@ -26,7 +26,8 @@ curve.checks <- function( dat ) {
     #  below (curve 1  < curve 2) or above (curve 1 > curve 2) zero (arbitrary)
     #  in order to not assign bias.
     pcurve.tol <- 0.1 #0.35
-    logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > 0.1)
+    curve.conc.min <- max(full.data$Curve.Concentrations, na.rm = T)/1000
+    logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > curve.conc.min)
     cb.data <- full.data[ eval(logical.test) ,{
       cbm <- mean(snRSD, na.rm = T)
       cbs <- sd(snRSD, na.rm = T)
