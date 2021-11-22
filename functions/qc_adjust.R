@@ -13,7 +13,7 @@ qc.adjust <- function( dat, ord = 3 ) {
     if(max_s > 0 ) {
       ss <- Signal_MFC/max_s
     } else {
-      ss <- NA
+      ss <- as.double(NA)
     }
     list(ss)
   } , by = Analytes]
