@@ -69,7 +69,7 @@ mfc.adjust   <- function( dat ) {
     
     # merge data with mfc values and apply correction
     full.data   <- merge(full.data, ml.mfc.red[,.(File.Name,MFC_c)], by = "File.Name", all.x = T)
-    full.data[ , Signal_MFC := ifelse(Analytes %in% analytes.include, Area_deiso/MFC_c, Area_deiso)]
+    full.data[ , Signal_MFC := ifelse(Analytes %in% analytes.include, Signal_deiso/MFC_c, Signal_deiso)]
     mfc.data <- data.table(merge(sample.data[ , .(File.Name,
                                                   File.Text,
                                                   Sample.Class,
@@ -162,7 +162,7 @@ mfc.adjust   <- function( dat ) {
   } else {
     
     dat$data[ , MFC_c := 1]
-    dat$data[ , Signal_MFC := dat$data$Area_deiso]
+    dat$data[ , Signal_MFC := dat$data$Signal_deiso]
     dat$mfc$done <- FALSE
     
   }

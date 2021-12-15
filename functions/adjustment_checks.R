@@ -14,7 +14,7 @@ adjustment.checks <- function(dat){
       s <- sd(d, na.rm = T)
       rsd <- s/m
       list(rsd)
-    } ) ,by = c("Analytes","Sample.ID") , .SDcols =  c("Area_deiso", "Signal_MFC", "Signal_MFC_QC") ]
+    } ) ,by = c("Analytes","Sample.ID") , .SDcols =  c("Signal_deiso", "Signal_MFC", "Signal_MFC_QC") ]
     
     # melt and delete NA obs so it doesnt give error in global rsd calc when no values present
     dc <- melt(dc,id.vars = c("Sample.ID","Analytes"),value.name = "RSD_sample", variable.name = "Data_type")

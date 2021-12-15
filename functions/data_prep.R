@@ -50,8 +50,8 @@ data.prep    <- function( project.path ) {
   # Merge QL data with compound data and set Analyte levels based on meta data order
   dat <- merge(analyte.data[ , .(QL_names,
                                  Analytes,
+                                 # Cycle,
                                  Label_Comp,
-                                 Cycle,
                                  Not_Use,
                                  Label_enrichment,
                                  Label_ID,
@@ -76,15 +76,41 @@ data.prep    <- function( project.path ) {
   dat$Polarity <- str_extract(project.path , "POS|NEG")
   dat$Assay <- project.path
   
-  # out
-  dat <- list(data         = dat,
-              data_path    = data.path,
-              analytes     = analyte.data,
-              samples      = sample.data,
-              assay_pars   = assay.data,
-              project_path = project.path,
-              meta_file    = meta.file)
+  # Choose signal type per analyte (Area or Height)
+  #  if there exists a column "Signal_type" in the analyte meta data
+  #  otherwise Signal defaults to Area
+  if ("Signal_type" %in% colnames(analyte.data)) {
+   
+    dat.signal <- dat[ , .(File.Name,QL_names,Area,Height)]
+    dat.signal <- sapply(analyte.data$QL_names, function(a) {
+      
+      st <- analyte.data[QL_names == a, Signal_type]
+      dat.signal[QL_names == a , .(File.Name,
+                                   QL_names,
+                                   Signal_type = st,
+                                   Signal = get(st))]
+      
+    }, simplify = F)  
+    dat.signal <- do.call(rbind, dat.signal)  
+    dat <- merge(dat, dat.signal , by = c("File.Name","QL_names"))
+    
+  } else {
+    
+    dat[ , Signal_type := "Area"]
+    dat[ , Signal := Area]
+    
+  }
   
-  return(dat)
+  
+  # out
+  dat.out <- list(data         = dat,
+                  data_path    = data.path,
+                  analytes     = analyte.data,
+                  samples      = sample.data,
+                  assay_pars   = assay.data,
+                  project_path = project.path,
+                  meta_file    = meta.file)
+  
+  return(dat.out)
   
 }

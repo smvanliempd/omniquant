@@ -7,20 +7,20 @@ deisotope    <- function( dat ){
   full.dat <- dat$data
   
   # Get 13C0-data (natural abundance)
-  dat.null <- full.dat[Analytes == Metabolite, .(File.Name,Metabolite, Area_sub = Area )]
+  dat.null <- full.dat[Analytes == Metabolite, .(File.Name,Metabolite, Signal_sub = Signal )]
   
   # merge null data with full data
   full.dat <- merge(full.dat , dat.null, by = c("File.Name","Metabolite") , all.y = T)
   
-  # subtract natural 13Cn (n>0) from labeled if not NA, otherwise take original area
-  full.dat[Analytes != Metabolite , Area_deiso := as.double(ifelse(is.na(Area_sub), Area, Area - Isotope_Corr * Area_sub ))]
+  # subtract natural 13Cn (n>0) from labeled if not NA, otherwise take original Signal
+  full.dat[Analytes != Metabolite , Signal_deiso := as.double(ifelse(is.na(Signal_sub), Signal, Signal - Isotope_Corr * Signal_sub ))]
   
-  # if subtractions lead to negative numbers set area to 0
-  # full.dat[Area_deiso < 0, Area_deiso:= 0]
-  full.dat[Area_deiso < 0, Area_deiso:= ifelse(Sample.Class == "Sample", NA, 0) ]
+  # if subtractions lead to negative numbers set Signal to 0
+  # full.dat[Signal_deiso < 0, Signal_deiso:= 0]
+  full.dat[Signal_deiso < 0, Signal_deiso:= ifelse(Sample.Class == "Sample", NA, 0) ]
   
-  # for 13C0 set Area_deiso to the original area
-  full.dat[Analytes == Metabolite ,Area_deiso := Area  ]
+  # for 13C0 set Signal_deiso to the original Signal
+  full.dat[Analytes == Metabolite ,Signal_deiso := Signal  ]
   
   # out
   dat$data <- full.dat
