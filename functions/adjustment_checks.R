@@ -4,17 +4,21 @@ adjustment.checks <- function(dat){
   # Get data
   project.path <- dat$project_path
   full.data    <- dat$data
-  n.analytes <- length(dat$analytes$Analytes)
+  n.analytes   <- length(dat$analytes$Analytes)
+  an.exclude    <- dat$analytes[!is.na(Calibrant_Only), Analytes]
   
   # check for duplicate injections for adjustment checks
   if (full.data[Sample.Class == "Sample", sum(Injection.Replicate  > 1)] > 0 ) {
     # calculate RSDs for uncorrected and corrected signals in samples
-    dc <- full.data[Sample.Class == "Sample", sapply(.SD, function(d) {
-      m <- mean(d, na.rm = T)
-      s <- sd(d, na.rm = T)
-      rsd <- s/m
-      list(rsd)
-    } ) ,by = c("Analytes","Sample.ID") , .SDcols =  c("Signal_deiso", "Signal_MFC", "Signal_MFC_QC") ]
+    dc <- full.data[Sample.Class == "Sample" & !(Analytes %in% an.exclude), 
+                    sapply(.SD, function(d) {
+                      m <- mean(d, na.rm = T)
+                      s <- sd(d, na.rm = T)
+                      rsd <- s/m
+                      list(rsd)
+                    } ),
+                    by = c("Analytes","Sample.ID"), 
+                    .SDcols =  c("Signal_deiso", "Signal_MFC", "Signal_MFC_QC") ]
     
     # melt and delete NA obs so it doesnt give error in global rsd calc when no values present
     dc <- melt(dc,id.vars = c("Sample.ID","Analytes"),value.name = "RSD_sample", variable.name = "Data_type")
