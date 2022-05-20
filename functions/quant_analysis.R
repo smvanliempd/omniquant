@@ -3,7 +3,7 @@ quant.analysis <- function(project.dirs) {
   i <- 1
   d.all <- sapply(project.dirs, function(project) {
     cat(paste0("Processing project ", i ," of ", l,"...\n",
-               "Path: ",getwd(),project,
+               "Path: ",project,
                "\n Data prepartion"))
     d1 <- data.prep(project)
     cat("...done!")
