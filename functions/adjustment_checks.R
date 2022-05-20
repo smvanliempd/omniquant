@@ -8,7 +8,7 @@ adjustment.checks <- function(dat){
   an.exclude    <- dat$analytes[!is.na(Calibrant_Only), Analytes]
   
   # check for duplicate injections for adjustment checks
-  if (full.data[Sample.Class == "Sample", sum(Injection.Replicate  > 1)] > 0 ) {
+  if (full.data[Sample.Class == "Sample", sum(Injection.Replicate  > 1, na.rm =T)] > 0 ) {
     # calculate RSDs for uncorrected and corrected signals in samples
     dc <- full.data[Sample.Class == "Sample" & !(Analytes %in% an.exclude), 
                     sapply(.SD, function(d) {
