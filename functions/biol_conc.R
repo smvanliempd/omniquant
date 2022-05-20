@@ -27,7 +27,7 @@ biol.conc    <- function( dat ) {
                                                                    Sample_amount/Weight)]
     
     # calculate concentrations per amount of cells
-    full.dat[ Sample.Class == "Sample" , Conc_biol := (loss_fact  * vol_res * Conc_raw_adj)/cell_nr] #nmol/million cells
+    full.dat[ Sample.Class == "Sample" , Conc_biol := (loss_fact  * vol_res * Conc_raw_adj)/cell_nr] #pmol/million cells
   }
   
   # correct signals for different resuspension and speedvac volumes in each assay
