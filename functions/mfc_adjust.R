@@ -108,12 +108,10 @@ mfc.adjust   <- function( dat ) {
                                        vjust = 0.5),
             axis.title.x = element_blank())
     ggsave(paste0(project.path,"/graphs/fc_plots.png"),
-           p1,
-           device = "png",
+           plot = p1,
            dpi = 300, 
-           units = "in",
            height= 8, 
-           width = 0.18*n_samples + 1)
+           width = 0.18 * n_samples + 1)
     
     p2 <- ggplot(ml.mfc.red, 
                  aes(x = Inj_nr,
@@ -129,8 +127,11 @@ mfc.adjust   <- function( dat ) {
       scale_x_continuous(breaks = seq(0,max(ml.mfc.red$Inj_nr), by = 10)) +
       ylim(0,NA)+
       theme_bw()
-    ggsave(paste0(project.path,"/graphs/mfc_vs_inj-nr.png"),p2,device = "png",dpi = 300, units = "in",
-           height= 5, width = 0.05*n_samples + 1)
+    ggsave(paste0(project.path,"/graphs/mfc_vs_inj-nr.png"),
+           plot = p2,
+           dpi = 300,
+           height= 5, 
+           width = 0.05*n_samples + 1)
     
     
     p3 <- ggplot(ml.mfc.red[Sample.Class == "Sample"], 
@@ -146,8 +147,31 @@ mfc.adjust   <- function( dat ) {
       theme_bw()+
       theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
             axis.title.x = element_blank())
-    ggsave(paste0(project.path,"/graphs/mfc_vs_sample-id.png"),p3,device = "png",dpi = 300, units = "in",
-           height= 5, width = 0.05*n_samples + 1)
+    ggsave(paste0(project.path,"/graphs/mfc_vs_sample-id.png"),
+          plot = p3,
+          dpi = 300, 
+          height= 5, 
+          width = 0.05 * n_samples + 1)
+    
+    p4 <- ggplot(ml.mfc.red[Sample.Class == "Sample"], 
+                 aes(
+                   x = Inj_nr,
+                   y = MFC_c,
+                   col = factor(Inj_rep)
+                 ) ) +
+      geom_point() +
+      geom_line(aes(group = Sample.ID), 
+                col = "grey50")+
+      scale_color_manual(values = c("blue","orangered"))+
+      scale_x_continuous(breaks = seq(0,max(ml.mfc.red$Inj_nr), by = 10)) +
+      ylim(0,NA)+
+      theme_bw()
+    ggsave(paste0(project.path,"/graphs/mfc_vs_inj-nr_sample-id.png"),
+           plot = p4,
+           dpi = 300,
+           height= 5, 
+           width = 0.05 * n_samples + 1)
+    
     
     # out
     dat$data <- full.data
@@ -157,6 +181,7 @@ mfc.adjust   <- function( dat ) {
                      plot_fc = p1,
                      plot_injnr = p2, 
                      plot_id = p3,
+                     plot_injnr_smplid = p4,
                      included = analytes.include )
     
   } else {
