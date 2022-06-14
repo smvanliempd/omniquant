@@ -1,5 +1,5 @@
 # QC corrections of MFC adjusted data 
-qc.adjust <- function( dat, ord = 3 ) {
+qc.adjust <- function( dat, ord ) {
   
   # get data
   full.data    <- dat$data
