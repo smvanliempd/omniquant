@@ -1,4 +1,4 @@
-quant.analysis <- function(project.dirs) {
+quant.analysis <- function(project.dirs, qc_pol_fit = 3) {
   l <- length(project.dirs)
   i <- 1
   d.all <- sapply(project.dirs, function(project) {
@@ -17,7 +17,7 @@ quant.analysis <- function(project.dirs) {
     d4 <- mfc.adjust.curve(d3)
     cat("...done!")
     cat(paste0("\n QC adjustments"))
-    d5 <- qc.adjust(d4) #change polynomial order with ord = x
+    d5 <- qc.adjust(d4, ord = qc_pol_fit)
     cat("...done!")
     cat(paste0("\n Check sample adjustments"))
     d6 <- adjustment.checks(d5)
