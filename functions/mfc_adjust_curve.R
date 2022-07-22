@@ -20,7 +20,7 @@ mfc.adjust.curve <- function( dat ) {
                                     Analytes %in% analytes.include & 
                                     Sample.Class == "Curve",
                                   coefs[1] + coefs[2] * Injection.Number, 1)]
-    full.data[Analytes %in% analytes.include & Sample.Class == "Curve" , Signal_MFC := Signal_deiso/MFC_mod]
+    full.data[Analytes %in% analytes.include & Sample.Class == "Curve", Signal_MFC := Signal_deiso/MFC_mod]
   }
   
   # Out

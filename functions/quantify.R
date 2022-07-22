@@ -1,7 +1,6 @@
 quantify     <- function( dat ) {
   
-  # dat <- readRDS("d6.rds")
-  # Declare data input
+  # get data
   project.path  <- dat$project_path
   full.data     <- dat$data
   calibrants    <- dat$calibrants
@@ -9,11 +8,19 @@ quantify     <- function( dat ) {
   quant.targets <- analyte.data$Analytes
   
   if (length(calibrants) > 0){
+    
     # replace adjusted curve values for calibration targets with those of the calibrants
-    full.data <- merge(full.data, analyte.data, by = "Analytes", all.x = T)
+    full.data <- merge(x = full.data, 
+                       y = analyte.data, 
+                       by = "Analytes", 
+                       all.x = T)
     cal.data  <- full.data[Sample.Class == "Curve" & Analytes %in% calibrants, .(File.Name,Analytes,Signal_adj_cal) ]
     setnames(cal.data, "Signal_adj_cal","Dummy")
-    full.data <- merge(full.data, cal.data , by.x = c("File.Name", "Calibrants"), by.y = c("File.Name", "Analytes"), all.x = T)
+    full.data <- merge(x = full.data, 
+                       y = cal.data, 
+                       by.x = c("File.Name", "Calibrants"), 
+                       by.y = c("File.Name", "Analytes"),
+                       all.x = T)
     full.data[ , Signal_adj_cal := Dummy]
     full.data[ , Dummy := NULL]
     
