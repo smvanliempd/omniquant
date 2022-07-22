@@ -2,75 +2,104 @@
 qc.adjust <- function( dat, ord ) {
   
   # get data
-  full.data    <- dat$data
-  qc.include   <- dat$analytes[Apply_QC_corr == "x" , Analytes ]
-  project.path <- dat$project_path
-  n.analytes   <- sum(nrow(dat$analytes))
+  full.data      <- dat$data
+  qc.met.include <- unique(dat$analytes[Apply_QC_corr == "x" , Metabolite ])
+  project.path   <- dat$project_path
+  n.analytes     <- sum(nrow(dat$analytes))
   
   # Scale MFC corrected QC values on first QC value
-  full.data[Sample.Class == "QC"  , QC_signal_s := {
-    max_s <- Signal_MFC[Injection.Replicate == 1]
-    if(max_s > 0 ) {
-      ss <- Signal_MFC/max_s
-    } else {
-      ss <- as.double(NA)
-    }
-    list(ss)
-  } , by = Analytes]
+  full.data[Sample.Class == "QC",
+            QC_signal_s := {
+              max_s <- Signal_MFC[Injection.Replicate == 1]
+              if(max_s > 0 ) {
+                ss <- Signal_MFC/max_s
+              } else {
+                ss <- as.double(NA)
+              }
+              list(ss)
+            } , by = Analytes]
   
   # Make QC models based on the non-labeled analyte
-  if (length(qc.include) > 0 ) { #check if there are any analytes that need QC correction
-    full.data[Analytes %in% qc.include & Analytes == Metabolite, QC_model := { 
+  #  if there are any analytes that need QC correction
+  if (length(qc.met.include) > 0 ) { 
+    
+    # get analyte with highest signal per metabolite
+    d.qc.high <- full.data[
+      Sample.Class == "QC" & Metabolite %in% qc.met.include         # get QC data for included metabolites
+      ][
+        , .(med_sig = median(Signal)), by = .(Metabolite, Analytes) # calculate median of QC signals per analyte
+      ][ 
+        , qc_rank := rank(-med_sig,), by = Metabolite               # rank on highest signal
+      ][
+      qc_rank == 1, Analytes                                        # select analytes to use for QC correction
+      ]
+    
+    # make models
+    qc.mods <- full.data[Analytes %in% d.qc.high,  { 
       
-      # define qc data
-      d   <- data.frame(signal = QC_signal_s, Inj = Injection.Number)
-      
+      # get qc data
+      d <- .SD[Sample.Class == "QC", .(signal = QC_signal_s, Inj = Injection.Number)]
+
       # linear model with order depending on the number of QCs available
       o <- 1:ord
-      f <- formula(paste0("signal ~ ",paste( paste0("I(Inj^", o, ")"), collapse  = "+") ) )
+      f <- formula(paste0("signal ~ ", paste(paste0("I(Inj^", o, ")"), collapse = "+") ) )
       m.lin  <- lm(f, data = d)
       c.lin  <- coef(m.lin)
       
       # calculate correction factor
-      S.mod <- sapply( c(o, ord + 1)  , function(i) c.lin[i] * Injection.Number^(i - 1), simplify = T  )
+      S.mod <- sapply( c(o, ord + 1), function(i) c.lin[i] * Injection.Number^(i - 1), simplify = T  )
       S.mod <- rowSums(S.mod)
-      
-      list(S.mod)
-      
-    }, by = Analytes ]
+
+      list(QC_model  = S.mod, 
+           File.Name = File.Name)
+
+    }, by = .(Metabolite,Analytes) ]
     
-    # Bind QC-model of unlabeled metabolite with corresponding labeled one
-    qc.mods <- full.data[Analytes %in% qc.include & Analytes == Metabolite,.(File.Name, Metabolite, QC_model)]
-    full.data[ ,QC_model := NULL]
-    full.data <- merge(full.data, qc.mods, by = c("File.Name", "Metabolite"), all.x = T)
+    # merge qc models
+    full.data <- merge(full.data, qc.mods[,.(File.Name, Metabolite, QC_model)],
+                       by = c("Metabolite", "File.Name"),
+                       all = T)
     
   } else {
     
     full.data[Sample.Class == "QC"  , QC_model := as.double(NA)]
     
   }
-  
-  
-  
   full.data[is.na(QC_model), QC_model := 1]
   
   # Adjust for QC drift (QC and Samples only)
-  full.data[ Sample.Class %in% c("QC","Sample"), Signal_MFC_QC := Signal_MFC/QC_model] #
+  full.data[Sample.Class %in% c("QC","Sample"), Signal_MFC_QC := Signal_MFC/QC_model] #
   
   # plot QC- drift models 
   qc.plots <- ggplot(full.data[Sample.Class %in% c("QC","Sample")] ) +
-    geom_point(aes(x   = Injection.Number,
-                   y   = QC_signal_s), na.rm = T) +
-    geom_line(aes(x = Injection.Number,
-                  y = QC_model), lty = 2, na.rm = T ) +
-    geom_hline(yintercept = 0.85, lty = 2, size = 0.3) +
-    scale_color_manual(name = "QC groups",values = c("#0029ff", "#ff5700"), na.translate = F ) +
-    labs(title = "QC trents",
-         subtitle = paste0("If necessary, QC adjustement done with \n",  ord,
-                           ifelse(ord == 1, "st",
-                                  ifelse(ord == 2, "nd", "rd") ),"-order polynomal."),
-         x = "Injection Number",
-         y = "QC-signals\n(scaled, max = 1; MFC adj)") +
+    geom_point(
+      aes(
+        x   = Injection.Number,
+        y   = QC_signal_s
+      ), 
+      na.rm = T
+    ) +
+    geom_line(
+      aes(
+        x = Injection.Number,
+        y = QC_model
+      ), 
+      lty = 2,
+      na.rm = T 
+    ) +
+    geom_hline(
+      yintercept = 0.85, 
+      lty = 2, 
+      size = 0.3
+    ) +
+    labs(
+      title = "QC trents",
+      subtitle = paste0("If necessary, QC adjustement done with \n",  ord,
+                        ifelse(ord == 1, "st",
+                               ifelse(ord == 2, "nd", "rd") ),"-order polynomal."),
+      x = "Injection Number",
+      y = "QC-signals\n(scaled, max = 1; MFC adj)"
+    ) +
     ylim(0,2) +
     facet_wrap( ~ Analytes, ncol = 6) +
     theme_bw()
