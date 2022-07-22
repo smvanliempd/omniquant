@@ -62,6 +62,7 @@ qc.adjust <- function( dat, ord ) {
     
   } else {
     
+    d.qc.high <- NA
     full.data[Sample.Class == "QC"  , QC_model := as.double(NA)]
     
   }
