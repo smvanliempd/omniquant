@@ -70,8 +70,11 @@ qc.adjust <- function( dat, ord ) {
   # Adjust for QC drift (QC and Samples only)
   full.data[Sample.Class %in% c("QC","Sample"), Signal_MFC_QC := Signal_MFC/QC_model] #
   
-  # plot QC- drift models 
-  qc.plots <- ggplot(full.data[Sample.Class %in% c("QC","Sample")] ) +
+  # plot QC- drift models
+  qc.dat <- full.data[Sample.Class %in% c("QC","Sample"),
+                      .(Injection.Number, QC_signal_s, QC_model, Analytes)]
+  qc.dat[ , Analytes_qc := ifelse(Analytes %in% d.qc.high, paste0(Analytes," (*)"), Analytes)]
+  qc.plots <- ggplot(qc.dat ) +
     geom_point(
       aes(
         x   = Injection.Number,
@@ -93,21 +96,20 @@ qc.adjust <- function( dat, ord ) {
       size = 0.3
     ) +
     labs(
-      title = "QC trents",
-      subtitle = paste0("If necessary, QC adjustement done with \n",  ord,
-                        ifelse(ord == 1, "st",
-                               ifelse(ord == 2, "nd", "rd") ),"-order polynomal."),
+      title = "QC trends",
+      subtitle = paste0("If necessary, QC adjustement done with\n",  ord,
+                       "-order polynomal. Reference analytes\nare indicated witn (*)"),
       x = "Injection Number",
-      y = "QC-signals\n(scaled, max = 1; MFC adj)"
+      y = "QC-signals\n(MFC adjusted, scaled, 1st = 1)"
     ) +
     ylim(0,2) +
-    facet_wrap( ~ Analytes, ncol = 6) +
+    facet_wrap( ~ Analytes_qc, ncol = 6) +
     theme_bw()
   ggsave(paste0(project.path, "/graphs/qc_plots.png"),
          qc.plots,
          dpi = 300,
-         width = ifelse(n.analytes < 6 , n.analytes * 6/3 , 8),
-         height = ceiling(n.analytes / 6) * 2)
+         width = ifelse(n.analytes < 6 , n.analytes * 6/3 + 2 , 10),
+         height = ceiling(n.analytes / 6) * 2 + 2)
   
   # Out
   dat$data <- full.data
