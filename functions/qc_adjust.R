@@ -103,7 +103,7 @@ qc.adjust <- function( dat, ord ) {
       x = "Injection Number",
       y = "QC-signals\n(MFC adjusted, scaled, 1st = 1)"
     ) +
-    ylim(0,2) +
+    # ylim(0,2) +
     facet_wrap( ~ Analytes_qc, ncol = 6) +
     theme_bw()
   ggsave(paste0(project.path, "/graphs/qc_plots.png"),
