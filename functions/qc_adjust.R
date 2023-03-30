@@ -94,7 +94,7 @@ qc.adjust <- function( dat, ord ) {
     geom_hline(
       yintercept = 0.85, 
       lty = 2, 
-      size = 0.3
+      linewidth = 0.3
     ) +
     labs(
       title = "QC trends",
