@@ -1,4 +1,4 @@
-quant.analysis <- function(project.dirs, qc_pol_fit = 3) {
+quant.analysis <- function(project.dirs, qc_pol_fit = 3, include_both_curves = FALSE) {
   l <- length(project.dirs)
   i <- 1
   d.all <- sapply(project.dirs, function(project) {
@@ -23,7 +23,7 @@ quant.analysis <- function(project.dirs, qc_pol_fit = 3) {
     d6 <- adjustment.checks(d5)
     cat("...done!")
     cat(paste0("\n Check calibration curves"))
-    d7 <- curve.checks(d6)
+    d7 <- curve.checks(d6, include.both = include_both_curves)
     cat("...done!")
     cat(paste0("\n Quantifications"))
     d8 <- quantify(d7)
