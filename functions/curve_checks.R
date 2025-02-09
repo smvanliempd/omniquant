@@ -1,7 +1,7 @@
 # Heuristic check if there is systematic bias between the 
 #  first and the second calibration curve after MFC correction.
 
-curve.checks <- function( dat ) {
+curve.checks <- function( dat, include.both ) {
   
   # Get data
   project.path <- dat$project_path
@@ -25,7 +25,7 @@ curve.checks <- function( dat ) {
     # less than 10% of the density of the snRSD distribution should be
     #  below (curve 1  < curve 2) or above (curve 1 > curve 2) zero (arbitrary)
     #  in order to not assign bias.
-    pcurve.tol <- 0.1 #0.35
+    pcurve.tol <- ifelse(include.both, 0, 0.1) #0.1 #0.35
     curve.conc.min <- max(full.data$Curve.Concentrations, na.rm = T)/1000
     logical.test <- expression(Analytes %in% calibrants & Sample.Class == "Curve" & Curve.Concentrations > curve.conc.min)
     cb.data <- full.data[ eval(logical.test) ,{
