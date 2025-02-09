@@ -29,7 +29,7 @@ quantify     <- function( dat ) {
               Baseline := .SD[ Curve.Concentrations == 0, mean(Signal_adj_cal,na.rm = T)  ] , 
               by = c("Analytes", "Injection.Replicate")  ]
     
-    # Subtract baseline from curves and delete signals below 3 sd's from the baseline
+    # Subtract baseline from curves and delete signals below 3-times mean from the baseline
     full.data[ , c("Curve_adj" , "Curve_min_adj") := {
       ai   <- Signal_adj_cal - Baseline
       mini <- 3 * Baseline
@@ -38,7 +38,7 @@ quantify     <- function( dat ) {
     }   ]
     
     ## Focused calibration
-    # Calculate median signal for each metabolite (was Analyte )
+    # Calculate median signal for each metabolite
     full.data[  ,Signal_med := .SD[Sample.Class == "Sample", median(Signal_MFC_QC, na.rm = T) ], by = Metabolite]
     full.data[ Sample.Class == "Curve", idx_focus  := ifelse(Curve_adj > Signal_med | is.na(Curve_adj) | Delete %in% c("curve"), F, T )  ]
     curve.tol <- 0.15
@@ -101,7 +101,7 @@ quantify     <- function( dat ) {
                       d_dev    <- matrix(    d_dev[,d_focus], nrow = nrow(d_dev)    )
                       d_qual   <- matrix(   d_qual[,d_focus], nrow = nrow(d_qual)   )
                       
-                      # Check which model includes the most unique concentrations after deleting dev<0.15 ( >0.15? )
+                      # Check which model includes the most unique concentrations after deleting dev>0.15
                       d_conc  <- apply(d_qual, 2, function(v) list( unique( conc[ !is.na(v) ] ) ) )
                       d_conc  <- sapply(d_conc,   function(v) length( unlist(v) ) , simplify = T )
                       
@@ -148,7 +148,7 @@ quantify     <- function( dat ) {
     # update final quantification targets based on the validity of the calibration curve; bad curve --> not included
     n.quant.targs <- length(quant.targets)
     
-    # Extrapolate curves
+    # Expand curves
     full.data[Analytes %in% quant.targets & Curve.Concentrations != 0, curve_mod  := {
       
       alpha     <- mean(alpha, na.rm = T)
@@ -197,7 +197,7 @@ quantify     <- function( dat ) {
       alpha  <- mean(alpha, na.rm = T)
       beta   <- mean(beta, na.rm = T)
       conc <- ( Signal_MFC_QC/(10^alpha) )^(1/beta)
-      conc_adj <- conc # * dil.homog
+      conc_adj <- conc
       list(conc, conc_adj, alpha, beta)
     }, by = Analytes]
     
