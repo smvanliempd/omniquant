@@ -39,7 +39,7 @@ mfc.adjust   <- function( dat ) {
     )
     
     # chuck out features with more than x% missing
-    ft.meta <- ft.meta[p_null < 0.3]
+    ft.meta <- ft.meta[p_null < 0.5]
     
     # filter ringing signals
     ft.meta <- ft.meta[
@@ -188,7 +188,7 @@ mfc.adjust   <- function( dat ) {
            height= 5, 
            width = 0.04*n_samples + 2)
     
-    
+    graph_colors <- palette.colors(n = max(ml.mfc.red$Inj_nr), palette = "Set 1", recycle = TRUE)
     p3 <- ggplot(ml.mfc.red[Sample.Class == "Sample"], 
                  aes(x = Sample.ID, 
                      y = MFC_c,
@@ -197,7 +197,7 @@ mfc.adjust   <- function( dat ) {
       geom_hline(yintercept = 0)+
       geom_point(alpha = 0.8) +
       scale_color_manual(name = "Injection\nnumber",
-                         values = c("blue","orangered","darkgreen"))+
+                         values = graph_colors)+
       ylim(0,NA)+
       theme_bw()+
       theme(axis.text.x = element_text(angle = 90,hjust = 1,vjust = 0.5),
@@ -217,7 +217,8 @@ mfc.adjust   <- function( dat ) {
       geom_point() +
       geom_line(aes(group = Sample.ID), 
                 col = "grey50")+
-      scale_color_manual(values = c("blue","orangered"))+
+      scale_color_manual(name = "Injection\nnumber",
+                         values = graph_colors)+
       scale_x_continuous(breaks = seq(0,max(ml.mfc.red$Inj_nr), by = 10)) +
       ylim(0,NA)+
       theme_bw() 
